@@ -1,0 +1,17 @@
+{
+  "year": 2027,
+  "country": "NL",
+  "holidays": [
+    { "date": "2027-01-01", "name": "Nieuwjaarsdag" },
+    { "date": "2027-03-26", "name": "Goede vrijdag" },
+    { "date": "2027-03-28", "name": "Eerste Paasdag" },
+    { "date": "2027-03-29", "name": "Tweede Paasdag" },
+    { "date": "2027-04-27", "name": "Koningsdag" },
+    { "date": "2027-05-05", "name": "Bevrijdingsdag" },
+    { "date": "2027-05-06", "name": "Hemelvaartsdag" },
+    { "date": "2027-05-16", "name": "Eerste Pinksterdag" },
+    { "date": "2027-05-17", "name": "Tweede Pinksterdag" },
+    { "date": "2027-12-25", "name": "Eerste Kerstdag" },
+    { "date": "2027-12-26", "name": "Tweede Kerstdag" }
+  ]
+}
