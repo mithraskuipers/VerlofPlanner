@@ -63,10 +63,14 @@ function renderCalendar() {
       cell.textContent = day;
 
       if (k === today) cell.classList.add("today");
+      if (dow < 5 && (planned[k] || !free[k])) {
+        cell.classList.add("clickable");
+        cell.onclick = () => toggleLeaveDay(k);
+      }
 
       if (planned[k]) {
         cell.classList.add("leave-day");
-        cell.title = "Verlof opgenomen";
+        cell.title = "Ingepland verlof (klik om te verwijderen)";
       } else if (free[k] && dow < 5) {
         cell.classList.add(
           free[k].type === "national" ? "national-holiday" : "custom-holiday",
@@ -77,7 +81,7 @@ function renderCalendar() {
         cell.title = free[k].name + " (valt in weekend)";
       } else if (suggestedDays.has(k)) {
         cell.classList.add("suggested-day");
-        cell.title = "Aanbevolen verlofdag";
+        cell.title = "Aanbevolen verlofdag (klik om in te plannen)";
       } else if (dow >= 5) {
         cell.classList.add("weekend");
       }
@@ -150,7 +154,7 @@ function renderSuggestions() {
 
       const calHtml = Object.entries(monthMap)
         .map(([mo, mDays]) => {
-          const firstDow = (new Date(mDays[0].date).getDay() + 6) % 7;
+          const firstDow = (parseLocalDate(mDays[0].date).getDay() + 6) % 7;
           let cells = "";
           for (let pad = 0; pad < firstDow; pad++) cells += "<div></div>";
           mDays.forEach((day) => {
@@ -177,25 +181,25 @@ function renderSuggestions() {
       const plural = (n) => (n !== 1 ? "en" : "");
       const notAfford = canAfford
         ? ""
-        : '<span style="color:var(--warn);font-size:12px;margin-left:auto;">Onvoldoende saldo</span>';
-      const disabledAttr = canAfford ? "" : ' disabled style="opacity:0.5"';
+        : '<span class="sug-warn">Onvoldoende saldo</span>';
+      const disabledAttr = canAfford ? "" : " disabled";
 
       return `<div class="suggestion-card">
       <div class="suggestion-header">
         <div>
           <div class="suggestion-title">${s.label}</div>
-          <div class="suggestion-meta">${s.daysToTake} verlofdag${plural(s.daysToTake)} opnemen · ${s.totalDaysOff} kalenderdagen aaneengesloten · ${s.freeworkCount} feestdag${plural(s.freeworkCount)} meegenomen</div>
+          <div class="suggestion-meta">${s.daysToTake} verlofdag${plural(s.daysToTake)} voor ${s.totalDaysOff} dagen vrij · ${s.freeworkCount} feestdag${plural(s.freeworkCount)}</div>
         </div>
         <span class="suggestion-score ${s.efficiencyClass}">${s.efficiencyLabel}</span>
       </div>
       <div class="sug-calendar-row">${calHtml}</div>
-      <div class="sug-legend-row">
-        <span class="sug-leg-item sc-free-leg">Feestdag</span>
-        <span class="sug-leg-item sc-take-leg">Op te nemen</span>
-        <span class="sug-leg-item sc-weekend-leg">Weekend</span>
-        ${notAfford}
-      </div>
-      <div style="padding:0 14px 12px;">
+      <div class="sug-footer">
+        <div class="sug-legend-row">
+          <span class="sug-leg-item sc-free-leg">Feestdag</span>
+          <span class="sug-leg-item sc-take-leg">Verlof</span>
+          <span class="sug-leg-item sc-weekend-leg">Weekend</span>
+          ${notAfford}
+        </div>
         <button class="btn btn-primary btn-sm" onclick="planSuggestion(${i})"${disabledAttr}>Inplannen</button>
       </div>
     </div>`;
@@ -204,9 +208,9 @@ function renderSuggestions() {
 
   // "Show more" button
   const limit = state.suggestionsLimit || 6;
-  container.innerHTML += `<div style="text-align:center;padding:8px 0 4px;">
-    <button class="btn btn-ghost btn-sm" id="showMoreSuggestions" onclick="showMoreSuggestions()">↓ Meer suggesties tonen</button>
-    ${limit > 6 ? `<button class="btn btn-ghost btn-sm" style="margin-left:8px;" onclick="showFewerSuggestions()">↑ Minder tonen</button>` : ""}
+  container.innerHTML += `<div class="sug-more">
+    <button class="btn btn-ghost btn-sm" id="showMoreSuggestions" onclick="showMoreSuggestions()">Meer tonen</button>
+    ${limit > 6 ? `<button class="btn btn-ghost btn-sm" onclick="showFewerSuggestions()">Minder tonen</button>` : ""}
   </div>`;
 }
 
@@ -227,8 +231,8 @@ function renderHolidaysList() {
   if (sourceEl) {
     const src = p._holidaySource;
     sourceEl.innerHTML = src === "json"
-      ? `<span class="source-badge source-json">📄 nl-${state.year}.json</span>`
-      : `<span class="source-badge source-fallback">⚙️ Berekend (fallback)</span>`;
+      ? `<span class="source-badge source-json">nl-${state.year}.json</span>`
+      : `<span class="source-badge source-fallback">Berekend (fallback)</span>`;
   }
   const sorted = Object.entries(free).sort((a, b) => a[0].localeCompare(b[0]));
   list.innerHTML = sorted
@@ -238,13 +242,13 @@ function renderHolidaysList() {
       const badgeTxt = isNational ? "Nationaal" : "Eigen";
       const delBtn = isNational
         ? ""
-        : `<button class="btn btn-danger btn-sm" onclick="removeCustomDay('${k}')">×</button>`;
+        : `<button class="btn btn-danger btn-icon" aria-label="Verwijderen" onclick="removeCustomDay('${k}')">×</button>`;
       return `<div class="day-item ${isNational ? "national" : "custom"}">
       <div>
-        <div style="font-weight:500;font-size:13px;">${v.name || v}</div>
-        <div style="font-size:11px;color:var(--muted);">${formatDate(k)}</div>
+        <div class="di-name">${v.name || v}</div>
+        <div class="di-sub">${formatDate(k)}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;">
+      <div class="di-actions">
         <span class="day-badge ${badge}">${badgeTxt}</span>${delBtn}
       </div>
     </div>`;
@@ -269,12 +273,12 @@ function renderPlannedList() {
       const [ky, km, kd] = k.split("-").map(Number);
       const dow = new Date(ky, km - 1, kd).getDay();
       const dayName = DAYS_NL[(dow + 6) % 7];
-      return `<div class="day-item custom">
+      return `<div class="day-item planned">
       <div>
-        <div style="font-weight:500;font-size:13px;">${formatDate(k)}</div>
-        <div style="font-size:11px;color:var(--muted);">${dayName}dag</div>
+        <div class="di-name">${formatDate(k)}</div>
+        <div class="di-sub">${dayName}dag</div>
       </div>
-      <button class="btn btn-danger btn-sm" onclick="removePlannedDay('${k}')">×</button>
+      <button class="btn btn-danger btn-icon" aria-label="Verwijderen" onclick="removePlannedDay('${k}')">×</button>
     </div>`;
     })
     .join("");
@@ -308,7 +312,7 @@ function renderStats() {
 
   const remaining = totalDays != null ? totalDays - plannedCount : null;
   document.getElementById("daysLeft").textContent =
-    remaining != null ? remaining : "—";
+    remaining != null ? remaining : "-";
   document.getElementById("daysPlanned").textContent =
     plannedCount +
     " dag" +
@@ -346,7 +350,7 @@ function renderStats() {
   const free = allFreeDays();
   let freeWorkdays = 0;
   Object.keys(free).forEach((k) => {
-    const d = new Date(k);
+    const d = parseLocalDate(k);
     if (d.getFullYear() === state.year && !isWeekend(d)) freeWorkdays++;
   });
   document.getElementById("totalFreeDays").textContent = freeWorkdays;
@@ -372,6 +376,26 @@ function renderProfileModal() {
     .join("");
 }
 
+function updateSliderFill(el) {
+  const min = parseFloat(el.min) || 0, max = parseFloat(el.max) || 100;
+  el.style.setProperty("--pct", ((el.value - min) / (max - min)) * 100 + "%");
+}
+
+function showToast(text, actionLabel, onAction) {
+  const t = document.getElementById("toast");
+  const btn = document.getElementById("toastAction");
+  document.getElementById("toastText").textContent = text;
+  btn.style.display = actionLabel ? "" : "none";
+  btn.textContent = actionLabel || "";
+  btn.onclick = () => {
+    if (onAction) onAction();
+    t.classList.remove("show");
+  };
+  t.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove("show"), actionLabel ? 6000 : 2000);
+}
+
 function setSlider(id, valId, value, fallback) {
   const el = document.getElementById(id);
   const valEl = document.getElementById(valId);
@@ -379,6 +403,7 @@ function setSlider(id, valId, value, fallback) {
   const v = (value != null && value !== "") ? value : fallback;
   el.value = v;
   if (valEl) valEl.textContent = v;
+  updateSliderFill(el);
 }
 
 function loadProfileSettings() {
@@ -440,8 +465,10 @@ document.getElementById("nextYear").onclick = () => {
   initYear();
 };
 
-document.getElementById("saveSettings").onclick = handleSaveSettings;
-document.getElementById("saveSettingsTop").onclick = handleSaveSettings;
+// Settings auto-save on every committed change (slider release or select change)
+document
+  .querySelectorAll(".col-settings input[type=range], .col-settings select")
+  .forEach((el) => el.addEventListener("change", handleSaveSettings));
 
 function handleSaveSettings() {
   const p = getProfile();
@@ -464,15 +491,7 @@ function handleSaveSettings() {
 
   save();
   renderAll();
-  ["saveSettings", "saveSettingsTop"].forEach((id) => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      btn.textContent = "Opgeslagen ✓";
-      setTimeout(() => {
-        btn.textContent = "Instellingen opslaan";
-      }, 2000);
-    }
-  });
+  showToast("Opgeslagen");
 }
 
 document.getElementById("addCustomDay").onclick = () => {
@@ -547,7 +566,10 @@ const sliderMap = {
 Object.entries(sliderMap).forEach(([sliderId, valId]) => {
   const el = document.getElementById(sliderId);
   const valEl = document.getElementById(valId);
-  if (el && valEl) el.addEventListener("input", () => { valEl.textContent = el.value; });
+  if (el && valEl) el.addEventListener("input", () => {
+    valEl.textContent = el.value;
+    updateSliderFill(el);
+  });
 });
 
 // ── BOOTSTRAP (after all functions are defined) ──────────────────────────────

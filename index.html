@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
 <title>Verlofplanner</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,9 +16,9 @@
   </div>
   <div class="header-actions">
     <div class="year-selector">
-      <button class="year-btn" id="prevYear">‹</button>
+      <button class="year-btn" id="prevYear" aria-label="Vorig jaar">‹</button>
       <span id="currentYearLabel">2026</span>
-      <button class="year-btn" id="nextYear">›</button>
+      <button class="year-btn" id="nextYear" aria-label="Volgend jaar">›</button>
     </div>
     <button class="profile-btn" id="openProfiles">
       <span id="profileName">Mijn profiel</span> ›
@@ -43,10 +43,10 @@
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" id="totalFreeDays">—</div>
+      <div class="stat-value" id="totalFreeDays">-</div>
       <div class="stat-card-text">
-        <div class="stat-label">Vrije dagen dit jaar</div>
-        <div class="stat-sub" id="freeDaysSub">feestdagen + weekend</div>
+        <div class="stat-label">Vrije werkdagen dit jaar</div>
+        <div class="stat-sub" id="freeDaysSub">feestdagen + eigen dagen</div>
       </div>
     </div>
   </div>
@@ -58,18 +58,16 @@
   <div class="content-row">
     <!-- COL 1: Settings + Holidays/Planned -->
     <div class="col-settings">
-      <div class="panel" style="margin-bottom: 16px;">
+      <div class="panel">
         <div class="panel-header">
           <div>
             <div class="panel-title">Verlofinstelling</div>
-            <div class="panel-subtitle">Jouw verlofbalans & wensen</div>
+            <div class="panel-subtitle">Wijzigingen worden automatisch opgeslagen</div>
           </div>
         </div>
         <div class="panel-body">
-          <button class="btn btn-primary" style="width:100%;margin-bottom:14px;" id="saveSettingsTop">Instellingen opslaan</button>
-          <!-- Mode toggle -->
+          <div class="panel-section">Saldo</div>
           <div class="form-group">
-            <label class="form-label">Verlof bijhouden in</label>
             <div class="mode-toggle" id="modeToggle">
               <button class="mode-btn active" data-mode="days" id="modeDaysBtn">Dagen</button>
               <button class="mode-btn" data-mode="hours" id="modeHoursBtn">Uren</button>
@@ -79,17 +77,17 @@
           <!-- DAYS MODE -->
           <div id="fieldsDays">
             <div class="form-group">
-              <label class="form-label">Totaal verlofdagen / jaar <span class="slider-val" id="totalDaysVal">20</span></label>
+              <label class="form-label" for="totalDays">Verlofdagen per jaar <span class="slider-val" id="totalDaysVal">20</span></label>
               <input type="range" id="totalDays" value="20" min="5" max="50" step="1" class="slider">
             </div>
             <div class="form-group">
-              <label class="form-label">Vervaldatum verlof</label>
+              <label class="form-label" for="expiryDateInputDays">Vervaldatum</label>
               <select id="expiryDateInputDays">
                 <option value="">Geen vervaldatum</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Dagen die vervallen <span class="slider-val" id="expiryDaysVal">0</span></label>
+              <label class="form-label" for="expiryDaysInput">Dagen die vervallen <span class="slider-val" id="expiryDaysVal">0</span></label>
               <input type="range" id="expiryDaysInput" value="0" min="0" max="25" step="1" class="slider">
             </div>
           </div>
@@ -97,38 +95,38 @@
           <!-- HOURS MODE -->
           <div id="fieldsHours" style="display:none;">
             <div class="form-group">
-              <label class="form-label">Totaal verlofuren / jaar <span class="slider-val" id="totalLeaveVal">160</span></label>
+              <label class="form-label" for="totalLeave">Verlofuren per jaar <span class="slider-val" id="totalLeaveVal">160</span></label>
               <input type="range" id="totalLeave" value="160" min="40" max="400" step="8" class="slider">
             </div>
             <div class="form-group">
-              <label class="form-label">Uren per dag (werkdag) <span class="slider-val" id="hoursPerDayVal">8</span></label>
+              <label class="form-label" for="hoursPerDay">Uren per werkdag <span class="slider-val" id="hoursPerDayVal">8</span></label>
               <input type="range" id="hoursPerDay" value="8" min="4" max="12" step="0.5" class="slider">
             </div>
             <div class="form-group">
-              <label class="form-label">Vervaldatum verlof</label>
+              <label class="form-label" for="expiryDateInput">Vervaldatum</label>
               <select id="expiryDateInput">
                 <option value="">Geen vervaldatum</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Uren die vervallen <span class="slider-val" id="expiryHoursVal">0</span></label>
+              <label class="form-label" for="expiryHours">Uren die vervallen <span class="slider-val" id="expiryHoursVal">0</span></label>
               <input type="range" id="expiryHours" value="0" min="0" max="200" step="8" class="slider">
             </div>
           </div>
 
+          <div class="panel-section">Suggesties</div>
           <div class="form-group">
-            <label class="form-label">Min. aaneengesloten kalenderdagen <span class="slider-val" id="minVacationVal">7</span></label>
-            <input type="range" id="minVacation" value="7" min="1" max="21" step="1" class="slider">
+            <label class="form-label" for="minVacation">Min. verlofdagen per periode <span class="slider-val" id="minVacationVal">3</span></label>
+            <input type="range" id="minVacation" value="3" min="1" max="21" step="1" class="slider">
           </div>
           <div class="form-group">
-            <label class="form-label">Max. verlofopname per keer <span class="slider-val" id="maxLeaveVal">5</span></label>
+            <label class="form-label" for="maxLeave">Max. verlofdagen per periode <span class="slider-val" id="maxLeaveVal">5</span></label>
             <input type="range" id="maxLeave" value="5" min="1" max="20" step="1" class="slider">
           </div>
           <div class="form-group">
-            <label class="form-label">Max. aaneengesloten kalenderdagen <span class="slider-val" id="maxCalendarDaysVal">10</span></label>
+            <label class="form-label" for="maxCalendarDays">Max. kalenderdagen per periode <span class="slider-val" id="maxCalendarDaysVal">10</span></label>
             <input type="range" id="maxCalendarDays" value="10" min="3" max="30" step="1" class="slider">
           </div>
-          <button class="btn btn-primary" style="width:100%" id="saveSettings">Instellingen opslaan</button>
         </div>
       </div>
 
@@ -144,14 +142,14 @@
               <div class="spinner"></div>
               Feestdagen ophalen...
             </div>
-            <div id="holidaySource" style="margin-bottom:8px;"></div>
+            <div id="holidaySource"></div>
             <div id="holidaysList" class="days-list" style="display:none"></div>
-            <hr style="border:none; border-top: 1px solid var(--border); margin: 1rem 0;">
-            <div class="form-label" style="margin-bottom: 6px;">Handmatig dag toevoegen</div>
+            <hr class="divider">
+            <div class="panel-section" style="margin-top:0">Eigen vrije dag toevoegen</div>
             <div class="input-row">
-              <input type="date" id="customDayDate">
-              <input type="text" id="customDayName" placeholder="Naam" style="max-width: 120px;">
-              <button class="btn btn-primary btn-sm" id="addCustomDay">+</button>
+              <input type="date" id="customDayDate" aria-label="Datum">
+              <input type="text" id="customDayName" placeholder="Naam" aria-label="Naam" style="max-width: 110px;">
+              <button class="btn btn-primary btn-sm" id="addCustomDay" aria-label="Toevoegen">+</button>
             </div>
           </div>
         </div>
@@ -159,7 +157,7 @@
         <div class="tab-content" id="tab-planned">
           <div class="panel-body">
             <div id="plannedList" class="days-list"></div>
-            <div class="empty-state" id="plannedEmpty" style="display:none;">Nog geen verlof ingepland</div>
+            <div class="empty-state" id="plannedEmpty" style="display:none;">Nog geen verlof ingepland.<br>Kies een suggestie of klik op een dag in het jaaroverzicht.</div>
           </div>
         </div>
       </div>
@@ -167,32 +165,34 @@
 
     <!-- COL 2: Suggestions -->
     <div class="col-suggestions">
-      <div class="panel" style="height:100%;">
+      <div class="panel">
         <div class="panel-header">
           <div>
             <div class="panel-title">Suggesties</div>
-            <div class="panel-subtitle">Gebaseerd op feestdagen in <span id="sugYear">2026</span></div>
+            <div class="panel-subtitle">Slim verlof rond feestdagen in <span id="sugYear">2026</span></div>
           </div>
-          <button class="btn btn-ghost btn-sm" id="recalcBtn">↻ Herberekenen</button>
+          <button class="btn btn-ghost btn-sm" id="recalcBtn">↻ Vernieuwen</button>
         </div>
-        <div id="suggestionsContainer" style="padding: 12px; overflow-y: auto;"></div>
+        <div id="suggestionsContainer"></div>
       </div>
     </div>
 
     <!-- COL 3: Calendar -->
     <div class="col-calendar">
-      <div class="panel calendar-section" style="height:100%;">
+      <div class="panel">
         <div class="panel-header">
-          <div class="panel-title">Jaaroverzicht <span id="calYear">2026</span></div>
+          <div>
+            <div class="panel-title">Jaaroverzicht <span id="calYear">2026</span></div>
+            <div class="panel-subtitle">Klik op een werkdag om verlof in te plannen of te verwijderen</div>
+          </div>
         </div>
         <div id="calendarGrid" class="calendar-grid"></div>
         <div class="legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--accent-light); border: 1.5px solid var(--accent-mid);"></div> Feestdag</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--blue-light); border: 1.5px solid #90B8E8;"></div> Eigen vrije dag</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--gold-light); border: 1.5px solid #E8D080; border-radius:3px;"></div> Opgenomen verlof</div>
-          <div class="legend-item"><div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;"><div style="width:5px;height:5px;border-radius:50%;background:var(--gold);"></div></div> Aanbevolen verlof</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--blue-light); border: 1.5px solid var(--blue); border-radius:50%;"></div> Aanbevolen dag</div>
-          <div class="legend-item"><div class="legend-dot" style="outline: 2px solid var(--accent-mid); outline-offset: -1px;"></div> Vandaag</div>
+          <div class="legend-item"><div class="legend-dot ld-national"></div> Feestdag</div>
+          <div class="legend-item"><div class="legend-dot ld-custom"></div> Eigen vrije dag</div>
+          <div class="legend-item"><div class="legend-dot ld-leave"></div> Ingepland verlof</div>
+          <div class="legend-item"><div class="legend-dot ld-suggested"></div> Aanbevolen</div>
+          <div class="legend-item"><div class="legend-dot ld-today"></div> Vandaag</div>
         </div>
       </div>
     </div>
@@ -204,8 +204,8 @@
   <div class="modal">
     <h2 class="modal-title">Profielen</h2>
     <div class="profile-list" id="profileList"></div>
-    <div class="input-row" style="margin-bottom: 0;">
-      <input type="text" id="newProfileName" placeholder="Nieuw profiel naam" style="background:var(--bg);">
+    <div class="input-row">
+      <input type="text" id="newProfileName" placeholder="Nieuw profiel">
       <button class="btn btn-primary btn-sm" id="addProfile">Toevoegen</button>
     </div>
     <div class="modal-actions">
@@ -213,6 +213,8 @@
     </div>
   </div>
 </div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastText"></span><button id="toastAction" style="display:none"></button></div>
 
 <!-- app.js must load before render.js (render.js calls functions from app.js) -->
 <script src="app.js"></script>

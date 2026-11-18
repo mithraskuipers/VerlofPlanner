@@ -32,7 +32,7 @@ const defaultProfile = () => ({
   expiryHours: 0,
   expiryDaysCount: 0,
   expiryDateDays: "",
-  minVacation: 7,
+  minVacation: 3,
   maxLeave: 5,
   maxCalendarDays: 10,
   customHolidays: {},
@@ -360,9 +360,24 @@ function planSuggestion(i) {
   const s = window._suggestions[i];
   const p = getProfile();
   if (!p.plannedDays) p.plannedDays = {};
+  const before = { ...p.plannedDays };
   s.freeDaysInPeriod.forEach((day) => {
     if (!day.isWeekend && !day.isFree) p.plannedDays[day.date] = true;
   });
+  save();
+  renderAll();
+  showToast(s.daysToTake + " verlofdag" + (s.daysToTake !== 1 ? "en" : "") + " ingepland", "Ongedaan maken", () => {
+    getProfile().plannedDays = before;
+    save();
+    renderAll();
+  });
+}
+
+function toggleLeaveDay(k) {
+  const p = getProfile();
+  if (!p.plannedDays) p.plannedDays = {};
+  if (p.plannedDays[k]) delete p.plannedDays[k];
+  else p.plannedDays[k] = true;
   save();
   renderAll();
 }
