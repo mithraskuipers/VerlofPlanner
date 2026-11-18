@@ -3,6 +3,7 @@
   --bg: #f2f2f7;
   --glass: rgba(255, 255, 255, 0.64);
   --glass-strong: rgba(255, 255, 255, 0.86);
+  --glass-solid: rgba(255, 255, 255, 0.78);
   --surface: var(--glass);
   --surface2: rgba(118, 118, 128, 0.12);
   --border: rgba(60, 60, 67, 0.14);
@@ -41,6 +42,7 @@
     --bg: #000000;
     --glass: rgba(44, 44, 46, 0.62);
     --glass-strong: rgba(44, 44, 46, 0.88);
+    --glass-solid: rgba(38, 38, 40, 0.78);
     --surface2: rgba(118, 118, 128, 0.24);
     --border: rgba(235, 235, 245, 0.14);
     --hairline: rgba(255, 255, 255, 0.08);
@@ -75,16 +77,23 @@ body {
   font-family: var(--font);
   color: var(--text);
   background-color: var(--bg);
-  background-image:
-    radial-gradient(900px 500px at 10% -10%, rgba(0, 122, 255, 0.14), transparent 60%),
-    radial-gradient(800px 500px at 95% 0%, rgba(175, 82, 222, 0.12), transparent 60%),
-    radial-gradient(900px 600px at 50% 110%, rgba(52, 199, 89, 0.1), transparent 60%);
-  background-attachment: fixed;
   min-height: 100vh;
   font-size: 15px;
   line-height: 1.5;
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(900px 500px at 10% -10%, rgba(0, 122, 255, 0.14), transparent 60%),
+    radial-gradient(800px 500px at 95% 0%, rgba(175, 82, 222, 0.12), transparent 60%),
+    radial-gradient(900px 600px at 50% 110%, rgba(52, 199, 89, 0.1), transparent 60%);
 }
 
 h1, h2, h3 { font-family: var(--font); font-weight: 600; letter-spacing: -0.02em; }
@@ -171,9 +180,7 @@ button, input, select { font-family: inherit; }
 }
 
 .stat-card {
-  background: var(--glass);
-  -webkit-backdrop-filter: var(--blur);
-  backdrop-filter: var(--blur);
+  background: var(--glass-solid);
   border: 1px solid var(--hairline);
   border-radius: var(--radius);
   padding: 1rem 1.25rem;
@@ -218,9 +225,7 @@ button, input, select { font-family: inherit; }
 
 /* ── PANELS ──────────────────────────────────────────────────────────────── */
 .panel {
-  background: var(--glass);
-  -webkit-backdrop-filter: var(--blur);
-  backdrop-filter: var(--blur);
+  background: var(--glass-solid);
   border: 1px solid var(--hairline);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -439,8 +444,6 @@ input:focus, select:focus {
   border-radius: 14px;
   margin-bottom: 1.25rem;
   font-size: 14px;
-  -webkit-backdrop-filter: var(--blur);
-  backdrop-filter: var(--blur);
 }
 .alert-warn { background: var(--warn-light); color: var(--warn); border: 1px solid var(--warn-light); }
 
